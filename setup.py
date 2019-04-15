@@ -34,16 +34,16 @@ else:
 
 vre = re.compile("__version__ = \"(.*?)\"")
 m = rd(os.path.join(os.path.dirname(os.path.abspath(__file__)),
-                    "emcee", "__init__.py"))
+                    "emcee_randa", "__init__.py"))
 version = vre.findall(m)[0]
 
 
 setup(
-    name="emcee",
+    name="emcee_randa",
     version=version,
     author="Daniel Foreman-Mackey",
     author_email="danfm@nyu.edu",
-    packages=["emcee"],
+    packages=["emcee_randa"],
     url="http://dan.iel.fm/emcee/",
     license="MIT",
     description="Kick ass affine-invariant ensemble MCMC sampling",

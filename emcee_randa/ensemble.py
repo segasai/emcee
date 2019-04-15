@@ -48,6 +48,9 @@ class EnsembleSampler(Sampler):
     :param a: (optional)
         The proposal scale parameter. (default: ``2.0``)
 
+    :param ascale: (optional)
+        The proposal scale parameter. (default: ``2``)
+
     :param args: (optional)
         A list of extra positional arguments for ``lnpostfn``. ``lnpostfn``
         will be called with the sequence ``lnpostfn(p, *args, **kwargs)``.
@@ -79,9 +82,10 @@ class EnsembleSampler(Sampler):
     """
     def __init__(self, nwalkers, dim, lnpostfn, a=2.0, args=[], kwargs={},
                  postargs=None, threads=1, pool=None, live_dangerously=False,
-                 runtime_sortingfn=None):
+                 runtime_sortingfn=None, ascale=2.0):
         self.k = nwalkers
         self.a = a
+        self.ascale = ascale
         self.threads = threads
         self.pool = pool
         self.runtime_sortingfn = runtime_sortingfn
@@ -321,13 +325,13 @@ class EnsembleSampler(Sampler):
         Ns = len(s)
         c = np.atleast_2d(p1)
         Nc = len(c)
-
+        cura = np.exp(np.random.uniform(np.log(1+1/self.ascale),np.log(self.ascale),size=Ns))
         # Generate the vectors of random numbers that will produce the
         # proposal.
-        zz = ((self.a - 1.) * self._random.rand(Ns) + 1) ** 2. / self.a
+        zz = ((cura - 1.) * self._random.rand(Ns) + 1) ** 2. / cura
         rint = self._random.randint(Nc, size=(Ns,))
 
-        # Calculate the proposed positions and the log-probability there.
+        # Calculate the proposed positions and the log-probability  there.
         q = c[rint] - zz[:, np.newaxis] * (c[rint] - s)
         newlnprob, blob = self._get_lnprob(q)
 
